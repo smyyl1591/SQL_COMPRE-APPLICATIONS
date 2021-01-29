@@ -1,0 +1,146 @@
+
+-----運算子-----
+select 3+5    as 加
+     , 6-2    as 減
+     , 7*6    as 乘
+     , 14/5   as 除1
+     , 14.0/5 as 除2
+
+
+--四捨五入
+select round(84.94, 2)  --小數以下2位
+select round(84.94, 1)  --小數以下1位
+select round(84.94, 0)  --整數1位
+select round(84.94,-1)  --整數2位
+select round(99.95, 1)  --溢位
+
+
+--天花板函數取大
+select ceiling(59.3)
+     , ceiling(59.8)
+
+
+--地板函數取小
+select floor(59.3)
+     , floor(59.8)
+
+
+--開平方根
+select sqrt(16)
+     , sqrt(16.556)
+
+
+--平方
+select square(3)
+     , square(11.25)
+
+--絕對值
+select abs(-69)
+
+
+
+
+-----常用資料類型-----
+-- 數值: int、float
+-- 日期: date、datetime
+-- 文字: char、varchar、nvarchar
+
+
+--轉換函數 cast() & convert()
+select 'abc'+10  --發生錯誤
+select 'abc'+cast(10 as varchar(20))    --varchar使用在cast & convert內，不給長度時，預設長度為30
+select 'abc'+convert(varchar(20), 10)
+select 99.95
+select cast(99.958 as float)
+select round(cast(99.95 as float),1)
+
+
+--常用的日期函數
+select getdate()               今天日期
+     , year(getdate())         西元年
+     , year(getdate())-1911    民國
+     , month(getdate())        月
+     , day(getdate())          日
+     , (month(getdate())+2)/3  季  --depends on month currently
+
+
+--使用 datepart() 取日期的部分
+select getdate()                      今天日期
+     , datepart(year , getdate())     西元年
+     , datepart(quarter, getdate())   季
+     , datepart(month, getdate())     月
+     , datepart(day,getdate())        日
+     , datepart(dw,getdate())         一周中的第幾天
+
+	  
+--常用字串函數
+
+select left('abcdefgABCDEFG',3)               --左邊取3個字
+     , right('abcdefgABCDEFG',3)              --右邊取3個字
+     , lower('abcdefgABCDEFG')                --轉成小寫
+     , upper('abcdefgABCDEFG')                --轉成大寫
+     , substring('abcdefgABCDEFG',2,3)        --取子字串，從第2個字取3個字
+     
+	 , charindex('abc','abcdefgABCDEFG')      --找'abc'在'abcdefgABCDEFG'字串中第一次出現的位置
+     , charindex('abc','abcdefgABCDEFG',2)    --從第2個字開始找'abc'在'abcdefgABCDEFG'字串中第一次出現的位置
+     , charindex('abb','abcdefgABCDEFG')      --找不到，回傳0
+     
+	 , replace('abcdefgABCDEFG','cd','xxx')    --用'xx'取代'cd'
+     , replace('abcdefgABCDEFG','cd','')      --用''取代'cd'，也就是將'cd'去除
+     , replicate('abc',3)                     --'abc'字串重複3次
+
+
+--資料查詢結構
+SELECT *
+FROM ttemp..[Shing_STANDARD_COMB_1809_201102$]
+WHERE
+GROUP BY
+HAVING
+ORDER BY
+
+---
+
+select 請問您的性別,count(*) as 計算
+from TTEMP.DBO.[Shing_STANDARD_COMB_1809_201102$]
+where [請問您平常會喝那些瓶裝飲料?] = 'A、B  都不喝'
+GROUP BY 請問您的性別
+HAVING count(*) > 100
+ORDER BY 計算 desc
+
+
+select [請問您平常會喝那些瓶裝飲料?]+'討厭鬼' , GETDATE()
+from TTEMP.DBO.[Shing_STANDARD_COMB_1809_201102$]
+where [請問您平常會喝那些瓶裝飲料?] = 'A、B  都不喝'
+
+
+select *
+from TTEMP.DBO.[Shing_STANDARD_COMB_1809_201102$]
+where [請問您的職業/產業] = '電信服務業'
+
+
+-----join寫法----- 
+-- inner join
+-- right outer join
+-- left outer join
+-- full outer join
+
+--12347729 (正規)
+SELECT count(*)
+FROM BSTAGE.dbo.mft_prf_contr_202010 as prf
+left outer join BSTAGE..PROJECT_MAPPING as pro on prf.cur_proj_cde = pro.IVR_CODE
+
+--12347729 (省略)
+SELECT count(*)
+FROM BSTAGE.dbo.mft_prf_contr_202010 as prf
+left join BSTAGE..PROJECT_MAPPING as pro on prf.cur_proj_cde = pro.IVR_CODE 
+
+
+
+
+-----子查詢-----
+select *
+from TTEMP.DBO.[Shing_STANDARD_COMB_1809_201102$]
+where [請問您平常會喝那些瓶裝飲料?] in (select [請問您平常會喝那些瓶裝飲料?]
+										from TTEMP.DBO.[Shing_STANDARD_COMB_1809_201102$]
+										where [請問您平常會喝那些瓶裝飲料?] <> 'A、B  都不喝'
+										group by [請問您平常會喝那些瓶裝飲料?])
